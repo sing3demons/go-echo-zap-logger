@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  go-service-app:
+    build: .
+    image: sing3demons/gin-backend-api:0.1
+    container_name: go-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/logs
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    depends_on:
+      - go-service-app
+  grafana:
+    image: grafana/grafana:latest
+    #    volumes: 
+    #      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
