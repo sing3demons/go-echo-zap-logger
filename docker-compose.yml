@@ -9,6 +9,12 @@ services:
       - "8080:8080"
     volumes:
       - ./logs:/logs
+    logging:
+      driver: "fluentd"
+      options:
+        tag: sing3demons/gin-backend-api:0.1
+    depends_on:
+      - fluentd
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -30,3 +36,13 @@ services:
       - prometheus
     ports:
       - "3000:3000"
+  fluentd:
+    image: fluent/fluentd:latest
+    ports:
+      - "24224:24224"
+    volumes:
+      - ./docker.conf:/fluentd/etc/docker.conf
+    environment:
+      - FLUENTD_CONF=docker.conf
+
+ 
