@@ -1,0 +1,33 @@
+version: "3.9"
+networks:
+  go-logger:
+    name: go-logger
+services:
+  fluentd:
+    build: ./fluentd
+    links:
+      - "elasticsearch"
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    networks:
+      - go-logger
+  elasticsearch:
+    image: elasticsearch:5.0
+    expose:
+      - 9200
+    ports:
+      - 9200:9200
+    networks:
+      - go-logger
+
+  kibana:
+    image: kibana:5.0
+    links:
+      - "elasticsearch"
+    ports:
+      - 5601:5601
+    networks:
+      - go-logger
